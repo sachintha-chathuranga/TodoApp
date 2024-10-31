@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sachintha.TodoApp.dto.TaskDto;
+import com.sachintha.TodoApp.dto.TaskUpdateDto;
 import com.sachintha.TodoApp.service.TaskService;
 
 import jakarta.validation.Valid;
@@ -33,14 +34,15 @@ public class TaskController {
 	}
 
 	@GetMapping("/getAll")
-	public ResponseEntity<Page<TaskDto>> getTasks(@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "10") int size) {
-		Page<TaskDto> tasks = taskService.getTasks(page, size);
+	public ResponseEntity<Page<TaskDto>> getTasks(@RequestParam(defaultValue = "0") String page,
+			@RequestParam(defaultValue = "10") String size, @RequestParam(defaultValue = "dueDate") String sortField,
+			@RequestParam(defaultValue = "asc") String sortDirection, @RequestParam(defaultValue = "") String keyword) {
+		Page<TaskDto> tasks = taskService.getTasks(page, size, sortField, sortDirection, keyword);
 		return ResponseEntity.status(HttpStatus.OK).body(tasks);
 	}
 
 	@PutMapping("/update")
-	public ResponseEntity<TaskDto> updateTask(@RequestBody TaskDto taskDto) {
+	public ResponseEntity<TaskDto> updateTask(@Valid @RequestBody TaskUpdateDto taskDto) {
 		TaskDto task = taskService.updateTask(taskDto);
 		return ResponseEntity.status(HttpStatus.OK).body(task);
 	}
