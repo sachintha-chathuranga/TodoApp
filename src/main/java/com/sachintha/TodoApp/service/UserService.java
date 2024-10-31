@@ -22,6 +22,7 @@ public class UserService {
 		User user = new User();
 		user.setEmail(credentials.getEmail());
 		user.setPassword(credentials.getPassword());
+		System.out.println(user);
 		userRepository.save(user);
 		return;
 	}

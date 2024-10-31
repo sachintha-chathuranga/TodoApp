@@ -18,6 +18,7 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(errorResponse, e.getStatus());
 	}
 
+//	this triger when invalide input comming with request
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ErrorResponse> handleValidationExceptions(final MethodArgumentNotValidException e,
 			WebRequest request) {
@@ -27,4 +28,11 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 	}
 
+//  For any Exception
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<ErrorResponse> handleGlobalException(Exception e, WebRequest request) {
+		ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(),
+				e.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+	}
 }

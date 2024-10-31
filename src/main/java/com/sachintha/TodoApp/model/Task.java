@@ -28,10 +28,20 @@ public class Task {
 	private Long id;
 	private String description;
 	private LocalDateTime dueDate;
+
 	private TaskPriority priority;
+
 	private TaskStatus status;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "userId")
 	private User user;
+
+	public Task(Long id, String description, LocalDateTime dueDate, TaskPriority priority, TaskStatus status) {
+		this.id = id;
+		this.description = description;
+		this.dueDate = dueDate;
+		this.priority = priority;
+		this.status = status;
+	}
 }
