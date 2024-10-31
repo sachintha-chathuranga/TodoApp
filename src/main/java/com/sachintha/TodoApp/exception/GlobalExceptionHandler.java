@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,6 +27,14 @@ public class GlobalExceptionHandler {
 		ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(),
 				errorMessage, request.getDescription(false));
 		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+	}
+
+//  when user not found in database while authentication
+	@ExceptionHandler(UsernameNotFoundException.class)
+	public ResponseEntity<ErrorResponse> handleGlobalException(UsernameNotFoundException e, WebRequest request) {
+		ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(), HttpStatus.NOT_FOUND.value(),
+				"Invalid Token, User not found!", request.getDescription(false));
+		return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
 	}
 
 //  For any Exception
