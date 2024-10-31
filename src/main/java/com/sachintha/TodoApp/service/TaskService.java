@@ -1,7 +1,8 @@
 package com.sachintha.TodoApp.service;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -30,11 +31,13 @@ public class TaskService {
 		return;
 	}
 
-	public List<TaskDto> getTasks() {
+	public Page<TaskDto> getTasks(int page, int size) {
 		User user = userRepository.findById(Long.valueOf("1"))
 				.orElseThrow(() -> new CustomException("User does not exists!", HttpStatus.NOT_FOUND));
-		List<TaskDto> taskList = user.getTasks().stream().map(t -> TaskMapper.mapToTaskDto(t)).toList();
-		return taskList;
+		Pageable pageable = PageRequest.of(page, size);
+		Page<Task> taskPage = taskRepository.findByUserId(user.getId(), pageable);
+		Page<TaskDto> taskDtoPage = taskPage.map(TaskMapper::mapToTaskDto);
+		return taskDtoPage;
 	}
 
 	public TaskDto updateTask(TaskDto taskDto) {

@@ -1,8 +1,7 @@
 package com.sachintha.TodoApp.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,8 +33,9 @@ public class TaskController {
 	}
 
 	@GetMapping("/getAll")
-	public ResponseEntity<List<TaskDto>> getTasks() {
-		List<TaskDto> tasks = taskService.getTasks();
+	public ResponseEntity<Page<TaskDto>> getTasks(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size) {
+		Page<TaskDto> tasks = taskService.getTasks(page, size);
 		return ResponseEntity.status(HttpStatus.OK).body(tasks);
 	}
 
