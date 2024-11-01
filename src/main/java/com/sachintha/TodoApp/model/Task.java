@@ -6,7 +6,6 @@ import com.sachintha.TodoApp.dto.TaskPriority;
 import com.sachintha.TodoApp.dto.TaskStatus;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,7 +32,7 @@ public class Task {
 
 	private TaskStatus status;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne()
 	@JoinColumn(name = "userId")
 	private User user;
 

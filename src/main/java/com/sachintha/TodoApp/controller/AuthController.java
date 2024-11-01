@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sachintha.TodoApp.dto.AuthResponse;
 import com.sachintha.TodoApp.dto.UserRegistrationDto;
 import com.sachintha.TodoApp.service.AuthService;
 
@@ -25,9 +26,8 @@ public class AuthController {
 		return authService.createUser(credentials);
 	}
 
-//	@PostMapping("/login")
-//	public ResponseEntity<AuthResponse> loginUser(@Valid @RequestBody UserRegistrationDto credentials) {
-//		authService.authenticateUser(credentials);
-//		return ResponseEntity.status(HttpStatus.CREATED).body();
-//	}
+	@PostMapping("/login")
+	public ResponseEntity<AuthResponse> loginUser(@Valid @RequestBody UserRegistrationDto credentials) {
+		return ResponseEntity.ok(authService.authenticateUser(credentials));
+	}
 }

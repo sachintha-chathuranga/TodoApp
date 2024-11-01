@@ -16,7 +16,6 @@ import com.sachintha.TodoApp.mapper.TaskMapper;
 import com.sachintha.TodoApp.model.Task;
 import com.sachintha.TodoApp.model.User;
 import com.sachintha.TodoApp.repository.TaskRepository;
-import com.sachintha.TodoApp.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,32 +25,30 @@ public class TaskService {
 
 	private final Logger logger = LoggerFactory.getLogger(TaskService.class);
 	private final TaskRepository taskRepository;
-	private final UserRepository userRepository;
+	private final JwtService jwtService;
 
 	public TaskDto createTask(TaskDto taskDto) {
-		logger.info("Starting create new task");
+		logger.trace("Invoking createTask method");
 		try {
 			if (taskDto == null) {
-				throw new NullPointerException("task cannot be null");
+				throw new NullPointerException("Task cannot be null");
 			}
-			User user = userRepository.findById(Long.valueOf("1"))
-					.orElseThrow(() -> new CustomException("User does not exists!", HttpStatus.NOT_FOUND));
+			User user = jwtService.getUserFromJwt();
 			Task newTask = TaskMapper.mapToTask(taskDto);
 			newTask.setUser(user);
 			taskRepository.save(newTask);
-			logger.info("Task Created successfully");
+			logger.info("Task Created successfully in createTask method");
 			return TaskMapper.mapToTaskDto(newTask);
 		} catch (Exception e) {
-			logger.error("error while create task", e);
+			logger.trace("Error during createTask: {}", e.getMessage());
 			throw e;
 		}
 	}
 
 	public Page<TaskDto> getTasks(String page, String size, String sortField, String sortDirection, String keyword) {
-		logger.info("Starting get tasks");
+		logger.trace("Invoking getTask method");
 		try {
-			User user = userRepository.findById(Long.valueOf("1"))
-					.orElseThrow(() -> new CustomException("User does not exists!", HttpStatus.NOT_FOUND));
+			User user = jwtService.getUserFromJwt();
 			Sort sort = Sort.by(sortField);
 			sort = sortDirection.equalsIgnoreCase("desc") ? sort.descending() : sort.ascending();
 
@@ -63,19 +60,24 @@ public class TaskService {
 				taskPage = taskRepository.findByUserId(user.getId(), pageable);
 			}
 			Page<TaskDto> taskDtoPage = taskPage.map(TaskMapper::mapToTaskDto);
-			logger.info("Get All task successfully");
+			logger.info("Get Tasks Action successfully in getTasks method");
 			return taskDtoPage;
 		} catch (Exception e) {
-			logger.error("error while geting task list", e);
+			logger.trace("Error during getTask: {}", e.getMessage());
 			throw e;
 		}
 	}
 
 	public TaskDto updateTask(TaskUpdateDto taskDto) {
-		logger.info("Starting Update task");
+		logger.trace("Invoking updateTask method");
 		try {
 			Task task = taskRepository.findById(taskDto.getId())
 					.orElseThrow(() -> new CustomException("Task does not exists!", HttpStatus.NOT_FOUND));
+			User taskOwner = task.getUser();
+			User logginUser = jwtService.getUserFromJwt();
+			if (!taskOwner.getId().equals(logginUser.getId())) {
+				throw new CustomException("You are not allow to Update Other users task", HttpStatus.FORBIDDEN);
+			}
 			if (taskDto.getDescription() != null) {
 				task.setDescription(taskDto.getDescription());
 			}
@@ -89,21 +91,29 @@ public class TaskService {
 				task.setStatus(taskDto.getStatus());
 			}
 			taskRepository.save(task);
+			logger.info("Update Task successfully in updateTask method");
 			return TaskMapper.mapToTaskDto(task);
 		} catch (Exception e) {
-			logger.error("error while updating task!", e);
+			logger.trace("Error during updateTask: {}", e.getMessage());
 			throw e;
 		}
 	}
 
 	public boolean deleteTask(Long id) {
-		logger.info("Start deleting task for the given id");
+		logger.trace("Invoking deleteTask method");
 		try {
+			Task task = taskRepository.findById(id)
+					.orElseThrow(() -> new CustomException("Task not found to delete", HttpStatus.NOT_FOUND));
+			User taskOwner = task.getUser();
+			User logginUser = jwtService.getUserFromJwt();
+			if (!taskOwner.getId().equals(logginUser.getId())) {
+				throw new CustomException("You are not allow to Delete Other users task", HttpStatus.FORBIDDEN);
+			}
 			taskRepository.deleteById(id);
-			logger.info("Task deleted successfully");
+			logger.info("Task deleted successfully in deleteTask method");
 			return true;
 		} catch (Exception e) {
-			logger.error("error while deleting task", e);
+			logger.trace("Error during deleteTask: {}", e.getMessage());
 			throw e;
 		}
 	}

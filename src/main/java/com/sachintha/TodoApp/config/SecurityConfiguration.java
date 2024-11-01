@@ -1,5 +1,6 @@
 package com.sachintha.TodoApp.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -10,6 +11,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.sachintha.TodoApp.security.JwtAuthEntyPoint;
 import com.sachintha.TodoApp.security.JwtAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
@@ -18,17 +20,22 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
+	@Autowired
 	private final JwtAuthenticationFilter JwtAuthFilter;
+	@Autowired
 	private final AuthenticationProvider authenticationProvider;
+	@Autowired
+	private final JwtAuthEntyPoint authEntyPoint;
 
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests(
-				(authorize) -> authorize.requestMatchers("/api/auth/**").permitAll().anyRequest().authenticated())
-				.cors(Customizer.withDefaults())
+	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http.csrf(csrf -> csrf.disable()).cors(Customizer.withDefaults())
 				.sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.authorizeHttpRequests((authorize) -> authorize.requestMatchers("/api/auth/**").permitAll().anyRequest()
+						.authenticated())
+				.addFilterBefore(JwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 				.authenticationProvider(authenticationProvider)
-				.addFilterBefore(JwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+				.exceptionHandling(e -> e.authenticationEntryPoint(authEntyPoint));
 		return http.build();
 	}
 }

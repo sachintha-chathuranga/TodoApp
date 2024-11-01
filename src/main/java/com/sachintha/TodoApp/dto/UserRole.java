@@ -1,4 +1,4 @@
-package com.sachintha.TodoApp.model;
+package com.sachintha.TodoApp.dto;
 
 public enum UserRole {
 	USER, ADMIN
