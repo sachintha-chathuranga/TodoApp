@@ -30,9 +30,6 @@ public class TaskService {
 	public TaskDto createTask(TaskDto taskDto) {
 		logger.trace("Invoking createTask method");
 		try {
-			if (taskDto == null) {
-				throw new NullPointerException("Task cannot be null");
-			}
 			User user = jwtService.getUserFromJwt();
 			Task newTask = TaskMapper.mapToTask(taskDto);
 			newTask.setUser(user);
@@ -68,10 +65,10 @@ public class TaskService {
 		}
 	}
 
-	public TaskDto updateTask(TaskUpdateDto taskDto) {
+	public TaskDto updateTask(Long taskId, TaskUpdateDto taskDto) {
 		logger.trace("Invoking updateTask method");
 		try {
-			Task task = taskRepository.findById(taskDto.getId())
+			Task task = taskRepository.findById(taskId)
 					.orElseThrow(() -> new CustomException("Task does not exists!", HttpStatus.NOT_FOUND));
 			User taskOwner = task.getUser();
 			User logginUser = jwtService.getUserFromJwt();

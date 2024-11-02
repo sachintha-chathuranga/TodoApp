@@ -21,12 +21,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@SuppressWarnings("serial")
 @Entity
 @Data
+@SuppressWarnings("serial")
+@Builder
 @Table(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor

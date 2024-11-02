@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,14 +42,15 @@ public class TaskController {
 		return ResponseEntity.status(HttpStatus.OK).body(tasks);
 	}
 
-	@PutMapping("/update")
-	public ResponseEntity<TaskDto> updateTask(@Valid @RequestBody TaskUpdateDto taskDto) {
-		TaskDto task = taskService.updateTask(taskDto);
+	@PutMapping("/update/{id}")
+	public ResponseEntity<TaskDto> updateTask(@PathVariable("id") Long taskId,
+			@Valid @RequestBody TaskUpdateDto taskDto) {
+		TaskDto task = taskService.updateTask(taskId, taskDto);
 		return ResponseEntity.status(HttpStatus.OK).body(task);
 	}
 
-	@DeleteMapping("/delete")
-	public ResponseEntity<String> deleteTask(@RequestParam Long taskId) {
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity<String> deleteTask(@PathVariable("id") Long taskId) {
 		taskService.deleteTask(taskId);
 		return ResponseEntity.status(HttpStatus.OK).body("Task deleted successfully!");
 	}
